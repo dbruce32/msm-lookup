@@ -72,7 +72,8 @@ export function MonsterSearch({ monsters }: MonsterSearchProps) {
           }}
           onKeyDown={handleKeyDown}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg
-                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                     bg-white text-gray-900 shadow-sm
+                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
                      placeholder:text-gray-400"
           aria-label="Search monsters by name"
           aria-controls="monster-results-listbox"
@@ -101,7 +102,7 @@ export function MonsterSearch({ monsters }: MonsterSearchProps) {
                 ref={listRef}
                 id="monster-results-listbox"
                 role="listbox"
-                className="border border-gray-200 rounded-lg divide-y divide-gray-100"
+                className="border border-gray-200 rounded-lg divide-y divide-gray-100 bg-white shadow-sm"
               >
                 {filtered.map((monster, index) => (
                   <li
@@ -118,14 +119,17 @@ export function MonsterSearch({ monsters }: MonsterSearchProps) {
                                  focus:outline-none
                                  ${
                                    focusedIndex === index
-                                     ? "bg-blue-50 ring-2 ring-inset ring-blue-500"
-                                     : "hover:bg-blue-50"
+                                     ? "bg-indigo-50 ring-2 ring-inset ring-indigo-400"
+                                     : "hover:bg-gray-50"
                                  }`}
                       tabIndex={-1}
                     >
-                      <span className="font-medium">{monster.name}</span>
-                      <span className="ml-2 text-sm text-gray-500">
-                        {monster.elements.join(", ")}
+                      <span className="font-medium text-gray-900">{monster.name}</span>
+                      <span className="ml-2 text-xs text-gray-400">
+                        {monster.class}
+                      </span>
+                      <span className="ml-1 text-sm text-gray-500">
+                        · {monster.elements.join(", ")}
                       </span>
                     </button>
                   </li>

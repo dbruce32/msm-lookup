@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#1e293b",
 };
 
 export default function RootLayout({
@@ -25,11 +25,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col">
-        <header className="border-b border-gray-200 bg-white">
+      <body className="min-h-screen flex flex-col bg-slate-100">
+        <header className="bg-slate-800 text-white shadow-md">
           <div className="max-w-3xl mx-auto px-4 py-4">
             <h1 className="text-xl font-bold">MSM Lookup</h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-slate-300">
               Monster Breeding Search Engine
             </p>
           </div>
@@ -37,12 +37,12 @@ export default function RootLayout({
         <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
           {children}
         </main>
-        <footer className="border-t border-gray-200 bg-white">
-          <div className="max-w-3xl mx-auto px-4 py-4 text-sm text-gray-500">
+        <footer className="bg-slate-800 text-slate-400">
+          <div className="max-w-3xl mx-auto px-4 py-4 text-sm">
             Data from{" "}
             <a
               href="https://dbruce32.github.io/msm-db/"
-              className="underline hover:text-gray-700"
+              className="underline hover:text-white transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
