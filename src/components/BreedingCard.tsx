@@ -7,6 +7,12 @@ interface BreedingCardProps {
   breeding: IslandBreeding;
 }
 
+const LABEL_STYLES: Record<string, string> = {
+  Common: "bg-gray-100 text-gray-600 border border-gray-200",
+  Rare: "bg-blue-50 text-blue-700 border border-blue-200",
+  Epic: "bg-amber-50 text-amber-700 border border-amber-300 font-bold shadow-[0_0_6px_rgba(245,158,11,0.2)]",
+};
+
 function BreedingRow({
   label,
   entry,
@@ -14,19 +20,27 @@ function BreedingRow({
   label: string;
   entry: BreedingEntry;
 }) {
+  const labelStyle = LABEL_STYLES[label] ?? LABEL_STYLES.Common;
+
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 py-2">
-      <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 w-16">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 py-3 px-4">
+      <span
+        className={`text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full w-fit ${labelStyle}`}
+      >
         {label}
       </span>
       <div className="flex-1">
-        <span className="font-medium">
-          {entry.pair[0]} + {entry.pair[1]}
+        <span className="font-medium text-gray-900">
+          {entry.pair[0]}
+        </span>
+        <span className="text-gray-300 mx-1.5">+</span>
+        <span className="font-medium text-gray-900">
+          {entry.pair[1]}
         </span>
       </div>
-      <div className="text-sm text-gray-600 flex gap-3">
-        <span>⏱ {entry.time}</span>
-        <span className="text-green-700">⚡ {entry.enhanced_time}</span>
+      <div className="text-sm flex gap-3">
+        <span className="text-gray-500">⏱ {entry.time}</span>
+        <span className="text-emerald-600 font-medium">⚡ {entry.enhanced_time}</span>
       </div>
     </div>
   );
@@ -42,9 +56,14 @@ export function BreedingCard({ island, breeding }: BreedingCardProps) {
   if (entries.length === 0) return null;
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 bg-white">
-      <h4 className="font-semibold text-gray-800 mb-2">{island}</h4>
-      <div className="divide-y divide-gray-100">
+    <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
+      <div className="px-4 py-2.5 bg-slate-200 border-b border-slate-300">
+        <h4 className="font-semibold text-slate-700 text-sm flex items-center gap-2">
+          <span>🏝️</span>
+          {island}
+        </h4>
+      </div>
+      <div className="bg-white divide-y divide-gray-100">
         {entries.map(({ label, entry }) => (
           <BreedingRow key={label} label={label} entry={entry} />
         ))}
