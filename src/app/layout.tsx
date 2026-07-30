@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/msm-lookup/favicon_maw.png",
   },
 };
 
@@ -27,11 +27,20 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-slate-100">
         <header className="bg-slate-800 text-white shadow-md">
-          <div className="max-w-3xl mx-auto px-4 py-4">
-            <h1 className="text-xl font-bold">MSM Lookup</h1>
-            <p className="text-sm text-slate-300">
-              Monster Breeding Search Engine
-            </p>
+          <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
+            <img
+              src="/msm-lookup/favicon_maw.png"
+              alt="MSM Lookup logo"
+              width={40}
+              height={40}
+              className="rounded"
+            />
+            <div>
+              <h1 className="text-xl font-bold">MSM Lookup</h1>
+              <p className="text-sm text-slate-300">
+                Monster Breeding Search Engine
+              </p>
+            </div>
           </div>
         </header>
         <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
