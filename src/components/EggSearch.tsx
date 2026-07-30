@@ -8,6 +8,7 @@ import { ElementIcon } from "./ElementIcon";
 interface EggSearchProps {
   monsters: Monster[];
   label: string;
+  allMonsters: Monster[];
 }
 
 type FilterKey = string;
@@ -66,7 +67,32 @@ function isCelestialAvailable(monster: Monster): boolean {
   return false;
 }
 
-export function EggSearch({ monsters, label }: EggSearchProps) {
+/**
+ * Calculate how many months until a celestial becomes available.
+ * Returns null if no availability data or currently available.
+ */
+function monthsUntilAvailable(monster: Monster): number | null {
+  if (isCelestialAvailable(monster)) return null;
+
+  const availability = monster.eggs?.availability;
+  if (!availability) return null;
+
+  const match = availability.match(/^(\w+)\s+\d+/);
+  if (!match) return null;
+
+  const startMonth = MONTH_NAMES.indexOf(match[1]);
+  if (startMonth === -1) return null;
+
+  const now = new Date();
+  const currentMonth = now.getUTCMonth();
+
+  let months = startMonth - currentMonth;
+  if (months <= 0) months += 12;
+
+  return months;
+}
+
+export function EggSearch({ monsters, label, allMonsters }: EggSearchProps) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Monster | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
@@ -325,6 +351,11 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
                             Available
                           </span>
                         )}
+                        {label === "Celestials" && !isCelestialAvailable(monster) && monthsUntilAvailable(monster) != null && (
+                          <span className="ml-2 text-xs text-gray-400">
+                            in {monthsUntilAvailable(monster)} mo
+                          </span>
+                        )}
                       </span>
                     </button>
                   </li>
@@ -336,7 +367,7 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
       )}
 
       {selected && (
-        <EggDetail monster={selected} onBack={() => setSelected(null)} />
+        <EggDetail monster={selected} onBack={() => setSelected(null)} allMonsters={allMonsters} />
       )}
     </div>
   );

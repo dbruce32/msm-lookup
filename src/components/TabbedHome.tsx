@@ -17,9 +17,10 @@ interface TabbedHomeProps {
   monsters: Monster[];
   wublins: Monster[];
   celestials: Monster[];
+  allMonsters: Monster[];
 }
 
-export function TabbedHome({ monsters, wublins, celestials }: TabbedHomeProps) {
+export function TabbedHome({ monsters, wublins, celestials, allMonsters }: TabbedHomeProps) {
   const [activeTab, setActiveTab] = useState("breeding");
 
   return (
@@ -33,10 +34,10 @@ export function TabbedHome({ monsters, wublins, celestials }: TabbedHomeProps) {
       >
         {activeTab === "breeding" && <MonsterSearch monsters={monsters} />}
         {activeTab === "wublins" && (
-          <EggSearch monsters={wublins} label="Wublins" />
+          <EggSearch monsters={wublins} label="Wublins" allMonsters={allMonsters} />
         )}
         {activeTab === "celestials" && (
-          <EggSearch monsters={celestials} label="Celestials" />
+          <EggSearch monsters={celestials} label="Celestials" allMonsters={allMonsters} />
         )}
         {activeTab === "about" && (
           <div className="space-y-6">
