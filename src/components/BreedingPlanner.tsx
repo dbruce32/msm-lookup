@@ -9,14 +9,13 @@ interface BreedingPlannerProps {
   allMonsters: Monster[];
 }
 
-interface BreedingAssignment {
+interface BreedOption {
   monster: string;
-  quantity: number;
+  island: string;
   timeMinutes: number;
   timeLabel: string;
   enhancedMinutes: number;
   enhancedLabel: string;
-  island: string;
 }
 
 interface ScheduledTask {
@@ -58,85 +57,129 @@ function formatMinutes(mins: number): string {
 }
 
 /**
- * For a given monster, find the fastest common breeding time and return its island.
+ * For a given monster, find ALL islands it can be bred on with their times.
  */
-function getFastestBreeding(
+function getAllBreedingOptions(
   monsterName: string,
-  allMonsters: Monster[],
-  useEnhanced: boolean
-): { time: number; enhancedTime: number; timeLabel: string; enhancedLabel: string; island: string } | null {
+  allMonsters: Monster[]
+): BreedOption[] {
   const mon = allMonsters.find((m) => m.name === monsterName);
-  if (!mon) return null;
+  if (!mon) return [];
 
-  let best: { time: number; enhancedTime: number; timeLabel: string; enhancedLabel: string; island: string } | null = null;
-
+  const options: BreedOption[] = [];
   for (const [island, breeding] of Object.entries(mon.breeding)) {
     if (breeding.common && breeding.common.time) {
       const time = parseTime(breeding.common.time);
       const enhancedTime = breeding.common.enhanced_time
         ? parseTime(breeding.common.enhanced_time)
         : time;
-      const compareTime = useEnhanced ? enhancedTime : time;
-      if (!best || compareTime < (useEnhanced ? best.enhancedTime : best.time)) {
-        best = {
-          time,
-          enhancedTime,
-          timeLabel: breeding.common.time,
-          enhancedLabel: breeding.common.enhanced_time || breeding.common.time,
-          island,
-        };
+      options.push({
+        monster: monsterName,
+        island,
+        timeMinutes: time,
+        timeLabel: breeding.common.time,
+        enhancedMinutes: enhancedTime,
+        enhancedLabel: breeding.common.enhanced_time || breeding.common.time,
+      });
+    }
+  }
+  return options;
+}
+
+/**
+ * Optimally distribute breeds across islands to minimize total time.
+ * 
+ * Strategy: For each breed (expanded by quantity), assign it to whichever
+ * island+structure combination finishes earliest after adding this breed.
+ * This greedily balances load across all available islands.
+ */
+function optimizeSchedule(
+  requirements: { monster: string; quantity: number }[],
+  allMonsters: Monster[],
+  structures: number,
+  useEnhanced: boolean
+): IslandSchedule[] {
+  // Track free-at time for each island's structures
+  // Key: island name, Value: array of free-at times (one per structure)
+  const islandStructures = new Map<string, number[]>();
+
+  // Track scheduled tasks per island
+  const islandTasks = new Map<string, ScheduledTask[]>();
+
+  // Collect all individual breeds, sorted longest first for better packing
+  const breeds: { monster: string; options: BreedOption[] }[] = [];
+  for (const req of requirements) {
+    const options = getAllBreedingOptions(req.monster, allMonsters);
+    if (options.length > 0) {
+      for (let i = 0; i < req.quantity; i++) {
+        breeds.push({ monster: req.monster, options });
       }
     }
   }
 
-  return best;
-}
-
-/**
- * Schedule breeds on a single island with N structures (parallel slots).
- */
-function scheduleIsland(
-  assignments: BreedingAssignment[],
-  structures: number,
-  useEnhanced: boolean
-): ScheduledTask[] {
-  const scheduled: ScheduledTask[] = [];
-  const structureFreeAt = new Array(structures).fill(0);
-
-  // Expand by quantity, sort longest first
-  const expanded: BreedingAssignment[] = [];
-  for (const a of assignments) {
-    for (let i = 0; i < a.quantity; i++) {
-      expanded.push(a);
-    }
-  }
-  expanded.sort((a, b) => {
-    const aTime = useEnhanced ? a.enhancedMinutes : a.timeMinutes;
-    const bTime = useEnhanced ? b.enhancedMinutes : b.timeMinutes;
-    return bTime - aTime;
+  // Sort by minimum available time descending (longest breeds first)
+  breeds.sort((a, b) => {
+    const aMin = Math.min(...a.options.map((o) => useEnhanced ? o.enhancedMinutes : o.timeMinutes));
+    const bMin = Math.min(...b.options.map((o) => useEnhanced ? o.enhancedMinutes : o.timeMinutes));
+    return bMin - aMin;
   });
 
-  for (const task of expanded) {
-    // Find structure with earliest free time
-    let minStruct = 0;
-    for (let i = 1; i < structures; i++) {
-      if (structureFreeAt[i] < structureFreeAt[minStruct]) minStruct = i;
-    }
-    const start = structureFreeAt[minStruct];
-    const duration = useEnhanced ? task.enhancedMinutes : task.timeMinutes;
-    const end = start + duration;
-    structureFreeAt[minStruct] = end;
+  for (const breed of breeds) {
+    let bestIsland = "";
+    let bestStructure = 0;
+    let bestEnd = Infinity;
+    let bestOption: BreedOption | null = null;
 
-    scheduled.push({
-      monster: task.monster,
-      start,
-      end,
-      structure: minStruct,
-      timeLabel: useEnhanced ? task.enhancedLabel : task.timeLabel,
-    });
+    for (const option of breed.options) {
+      const duration = useEnhanced ? option.enhancedMinutes : option.timeMinutes;
+
+      // Initialize island structures if not seen yet
+      if (!islandStructures.has(option.island)) {
+        islandStructures.set(option.island, new Array(structures).fill(0));
+        islandTasks.set(option.island, []);
+      }
+
+      const freeAts = islandStructures.get(option.island)!;
+
+      // Find the earliest-free structure on this island
+      for (let s = 0; s < structures; s++) {
+        const end = freeAts[s] + duration;
+        if (end < bestEnd) {
+          bestEnd = end;
+          bestIsland = option.island;
+          bestStructure = s;
+          bestOption = option;
+        }
+      }
+    }
+
+    if (bestOption) {
+      const freeAts = islandStructures.get(bestIsland)!;
+      const start = freeAts[bestStructure];
+      freeAts[bestStructure] = bestEnd;
+
+      islandTasks.get(bestIsland)!.push({
+        monster: breed.monster,
+        start,
+        end: bestEnd,
+        structure: bestStructure,
+        timeLabel: useEnhanced ? bestOption.enhancedLabel : bestOption.timeLabel,
+      });
+    }
   }
 
-  return scheduled;
+  // Build island schedules
+  const schedules: IslandSchedule[] = [];
+  for (const [island, tasks] of Array.from(islandTasks.entries())) {
+    if (tasks.length > 0) {
+      const totalTime = Math.max(...tasks.map((t) => t.end), 0);
+      schedules.push({ island, tasks, totalTime });
+    }
+  }
+
+  // Sort by total time descending (bottleneck first)
+  schedules.sort((a, b) => b.totalTime - a.totalTime);
+  return schedules;
 }
 
 const COLORS = [
@@ -158,70 +201,37 @@ export function BreedingPlanner({ monster, allMonsters }: BreedingPlannerProps) 
 
   const eggs = monster.eggs;
 
-  // Assign each requirement to its fastest island
-  const assignments = useMemo(() => {
+  const islandSchedules = useMemo(() => {
     if (!eggs || !eggs.requirements) return [];
-    const result: BreedingAssignment[] = [];
-    for (const req of eggs.requirements) {
-      const breeding = getFastestBreeding(req.monster, allMonsters, useEnhanced);
-      if (breeding) {
-        result.push({
-          monster: req.monster,
-          quantity: req.quantity,
-          timeMinutes: breeding.time,
-          timeLabel: breeding.timeLabel,
-          enhancedMinutes: breeding.enhancedTime,
-          enhancedLabel: breeding.enhancedLabel,
-          island: breeding.island,
-        });
-      }
-    }
-    return result;
-  }, [eggs, allMonsters, useEnhanced]);
+    return optimizeSchedule(eggs.requirements, allMonsters, structures, useEnhanced);
+  }, [eggs, allMonsters, structures, useEnhanced]);
 
-  // Group assignments by island
-  const islandGroups = useMemo(() => {
-    const map = new Map<string, BreedingAssignment[]>();
-    for (const a of assignments) {
-      const group = map.get(a.island) || [];
-      group.push(a);
-      map.set(a.island, group);
-    }
-    return map;
-  }, [assignments]);
-
-  // Schedule each island independently
-  const islandSchedules = useMemo((): IslandSchedule[] => {
-    const schedules: IslandSchedule[] = [];
-    for (const [island, group] of Array.from(islandGroups.entries())) {
-      const tasks = scheduleIsland(group, structures, useEnhanced);
-      const totalTime = Math.max(...tasks.map((t) => t.end), 0);
-      schedules.push({ island, tasks, totalTime });
-    }
-    // Sort by total time descending (longest island first)
-    schedules.sort((a, b) => b.totalTime - a.totalTime);
-    return schedules;
-  }, [islandGroups, structures, useEnhanced]);
-
-  // Global max time (the bottleneck island determines total)
   const globalMaxTime = useMemo(
     () => Math.max(...islandSchedules.map((s) => s.totalTime), 0),
+    [islandSchedules]
+  );
+
+  const totalBreeds = useMemo(
+    () => islandSchedules.reduce((sum, s) => sum + s.tasks.length, 0),
     [islandSchedules]
   );
 
   // Color map by monster name
   const colorMap = useMemo(() => {
     const map = new Map<string, string>();
-    const uniqueMonsters = Array.from(new Set(assignments.map((a) => a.monster)));
-    uniqueMonsters.forEach((name, i) => {
+    const allNames = new Set<string>();
+    for (const s of islandSchedules) {
+      for (const t of s.tasks) {
+        allNames.add(t.monster);
+      }
+    }
+    Array.from(allNames).forEach((name, i) => {
       map.set(name, COLORS[i % COLORS.length]);
     });
     return map;
-  }, [assignments]);
+  }, [islandSchedules]);
 
-  if (!eggs || !eggs.requirements || assignments.length === 0) return null;
-
-  const totalBreeds = assignments.reduce((sum, a) => sum + a.quantity, 0);
+  if (!eggs || !eggs.requirements || islandSchedules.length === 0) return null;
 
   return (
     <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
@@ -281,45 +291,42 @@ export function BreedingPlanner({ monster, allMonsters }: BreedingPlannerProps) 
             </div>
 
             {/* Rows per island */}
-            {islandSchedules.map(({ island, tasks }) => {
-              const rowCount = structures;
-              return (
-                <div key={island} className="mb-2">
-                  {Array.from({ length: rowCount }).map((_, structIdx) => {
-                    const structTasks = tasks.filter((t) => t.structure === structIdx);
-                    return (
-                      <div key={structIdx} className="flex items-center mb-0.5">
-                        <div className="w-32 flex-shrink-0 flex items-center gap-1.5 pr-2">
-                          {structIdx === 0 && (
-                            <>
-                              <IslandIcon island={island} size={20} />
-                              <span className="text-xs text-gray-600 truncate">{island}</span>
-                            </>
-                          )}
-                        </div>
-                        <div className="flex-1 relative h-7 bg-gray-50 rounded border border-gray-100">
-                          {structTasks.map((task, i) => {
-                            const left = globalMaxTime > 0 ? (task.start / globalMaxTime) * 100 : 0;
-                            const width = globalMaxTime > 0 ? ((task.end - task.start) / globalMaxTime) * 100 : 0;
-                            const color = colorMap.get(task.monster) || COLORS[0];
-                            return (
-                              <div
-                                key={`${task.monster}-${task.start}-${i}`}
-                                className={`absolute top-0.5 bottom-0.5 rounded border text-[10px] flex items-center px-1 overflow-hidden whitespace-nowrap ${color}`}
-                                style={{ left: `${left}%`, width: `${Math.max(width, 0.5)}%` }}
-                                title={`${task.monster} (${task.timeLabel})`}
-                              >
-                                {width > 8 && <span className="truncate">{task.monster}</span>}
-                              </div>
-                            );
-                          })}
-                        </div>
+            {islandSchedules.map(({ island, tasks }) => (
+              <div key={island} className="mb-2">
+                {Array.from({ length: structures }).map((_, structIdx) => {
+                  const structTasks = tasks.filter((t) => t.structure === structIdx);
+                  return (
+                    <div key={structIdx} className="flex items-center mb-0.5">
+                      <div className="w-32 flex-shrink-0 flex items-center gap-1.5 pr-2">
+                        {structIdx === 0 && (
+                          <>
+                            <IslandIcon island={island} size={20} />
+                            <span className="text-xs text-gray-600 truncate">{island}</span>
+                          </>
+                        )}
                       </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
+                      <div className="flex-1 relative h-7 bg-gray-50 rounded border border-gray-100">
+                        {structTasks.map((task, i) => {
+                          const left = globalMaxTime > 0 ? (task.start / globalMaxTime) * 100 : 0;
+                          const width = globalMaxTime > 0 ? ((task.end - task.start) / globalMaxTime) * 100 : 0;
+                          const color = colorMap.get(task.monster) || COLORS[0];
+                          return (
+                            <div
+                              key={`${task.monster}-${task.start}-${i}`}
+                              className={`absolute top-0.5 bottom-0.5 rounded border text-[10px] flex items-center px-1 overflow-hidden whitespace-nowrap ${color}`}
+                              style={{ left: `${left}%`, width: `${Math.max(width, 0.5)}%` }}
+                              title={`${task.monster} (${task.timeLabel})`}
+                            >
+                              {width > 8 && <span className="truncate">{task.monster}</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         </div>
 
