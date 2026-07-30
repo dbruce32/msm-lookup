@@ -7,6 +7,7 @@ import { CurrencyValue, CurrencyIcon } from "./CurrencyIcon";
 import { GridIcon } from "./GridIcon";
 import { EggIcon, TimeIcon } from "./Icons";
 import { IslandIcon } from "./IslandIcon";
+import { BreedingPlanner } from "./BreedingPlanner";
 
 interface EggDetailProps {
   monster: Monster;
@@ -217,6 +218,9 @@ export function EggDetail({ monster, onBack, allMonsters }: EggDetailProps) {
           Adult Celestial — available during specific months
         </p>
       )}
+
+      {/* Breeding Planner */}
+      <BreedingPlanner monster={monster} allMonsters={allMonsters} />
     </div>
   );
 }
