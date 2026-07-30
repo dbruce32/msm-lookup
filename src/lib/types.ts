@@ -1,13 +1,15 @@
 export interface BreedingEntry {
-  pair: [string, string];
-  time: string;
-  enhanced_time: string;
+  pair?: [string, string];
+  time?: string;
+  enhanced_time?: string;
+  note?: string;
 }
 
 export interface IslandBreeding {
   common?: BreedingEntry | null;
   rare?: BreedingEntry | null;
   epic?: BreedingEntry | null;
+  note?: string;
 }
 
 export interface EggRequirement {

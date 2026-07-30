@@ -30,19 +30,27 @@ function BreedingRow({
       >
         {label}
       </span>
-      <div className="flex-1">
-        <span className="font-medium text-gray-900">
-          {entry.pair[0]}
-        </span>
-        <span className="text-gray-300 mx-1.5">+</span>
-        <span className="font-medium text-gray-900">
-          {entry.pair[1]}
-        </span>
-      </div>
-      <div className="text-sm flex gap-3">
-        <span className="text-gray-500">⏱ {entry.time}</span>
-        <span className="text-emerald-600 font-medium">⚡ {entry.enhanced_time}</span>
-      </div>
+      {entry.note ? (
+        <div className="flex-1 text-sm text-gray-600 italic">
+          {entry.note}
+        </div>
+      ) : (
+        <>
+          <div className="flex-1">
+            <span className="font-medium text-gray-900">
+              {entry.pair?.[0]}
+            </span>
+            <span className="text-gray-300 mx-1.5">+</span>
+            <span className="font-medium text-gray-900">
+              {entry.pair?.[1]}
+            </span>
+          </div>
+          <div className="text-sm flex gap-3">
+            <span className="text-gray-500">⏱ {entry.time}</span>
+            <span className="text-emerald-600 font-medium">⚡ {entry.enhanced_time}</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -54,17 +62,22 @@ export function BreedingCard({ island, breeding }: BreedingCardProps) {
   if (breeding.rare) entries.push({ label: "Rare", entry: breeding.rare });
   if (breeding.epic) entries.push({ label: "Epic", entry: breeding.epic });
 
-  if (entries.length === 0) return null;
+  if (entries.length === 0 && !breeding.note) return null;
 
   return (
     <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
       <div className="px-4 py-2.5 bg-slate-200 border-b border-slate-300">
         <h4 className="font-semibold text-slate-700 text-sm flex items-center gap-2">
-          <IslandIcon island={island} size={28} />
+          <IslandIcon island={island} size={36} />
           {island}
         </h4>
       </div>
       <div className="bg-white divide-y divide-gray-100">
+        {breeding.note && entries.length === 0 && (
+          <div className="px-4 py-3 text-sm text-gray-600 italic">
+            {breeding.note}
+          </div>
+        )}
         {entries.map(({ label, entry }) => (
           <BreedingRow key={label} label={label} entry={entry} />
         ))}
