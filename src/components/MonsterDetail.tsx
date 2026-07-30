@@ -9,8 +9,45 @@ interface MonsterDetailProps {
   onBack: () => void;
 }
 
+const ISLAND_ORDER: string[] = [
+  "Plant Island",
+  "Cold Island",
+  "Air Island",
+  "Water Island",
+  "Earth Island",
+  "Shugabush Island",
+  "The Colossingum",
+  "Gold Island",
+  "Ethereal Island",
+  "Ethereal Workshop",
+  "Fire Haven",
+  "Fire Oasis",
+  "Mythical Island",
+  "Light Island",
+  "Psychic Island",
+  "Faerie Island",
+  "Bone Island",
+  "Magical Sanctum",
+  "Magical Nexus",
+  "Major Paironormal Carnival",
+  "Minor Paironormal Carnival",
+  "Seasonal Shanty",
+  "Amber Island",
+  "Wublin Island",
+  "Celestial Island",
+  "Tribal Island",
+  "Composer Island",
+];
+
+function getIslandSortIndex(island: string): number {
+  const idx = ISLAND_ORDER.indexOf(island);
+  return idx === -1 ? ISLAND_ORDER.length : idx;
+}
+
 export function MonsterDetail({ monster, onBack }: MonsterDetailProps) {
-  const islands = Object.entries(monster.breeding);
+  const islands = Object.entries(monster.breeding).sort(
+    ([a], [b]) => getIslandSortIndex(a) - getIslandSortIndex(b)
+  );
 
   return (
     <div className="space-y-4">
