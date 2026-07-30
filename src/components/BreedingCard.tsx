@@ -1,6 +1,7 @@
 "use client";
 
 import type { IslandBreeding, BreedingEntry } from "@/lib/types";
+import { IslandIcon } from "./IslandIcon";
 
 interface BreedingCardProps {
   island: string;
@@ -59,7 +60,7 @@ export function BreedingCard({ island, breeding }: BreedingCardProps) {
     <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
       <div className="px-4 py-2.5 bg-slate-200 border-b border-slate-300">
         <h4 className="font-semibold text-slate-700 text-sm flex items-center gap-2">
-          <span>🏝️</span>
+          <IslandIcon island={island} size={28} />
           {island}
         </h4>
       </div>

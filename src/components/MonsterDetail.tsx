@@ -22,7 +22,15 @@ export function MonsterDetail({ monster, onBack }: MonsterDetailProps) {
         ← Back to results
       </button>
 
-      <div className="rounded-lg p-5 bg-slate-200 shadow-sm border border-slate-300">
+      <div className="rounded-lg p-5 bg-slate-200 shadow-sm border border-slate-300 relative">
+        <a
+          href={`https://mysingingmonsters.fandom.com/wiki/${encodeURIComponent(monster.name.replace(/ /g, "_"))}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-4 right-4 text-sm text-indigo-600 hover:text-indigo-800 underline transition-colors"
+        >
+          View on Wiki ↗
+        </a>
         <h2 className="text-2xl font-bold text-slate-900">{monster.name}</h2>
         <p className="mt-1 text-sm text-slate-500">
           {monster.class}

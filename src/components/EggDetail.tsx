@@ -2,17 +2,20 @@
 
 import type { Monster } from "@/lib/types";
 import { ElementIcon } from "./ElementIcon";
+import { CurrencyValue, CurrencyIcon } from "./CurrencyIcon";
+import { GridIcon } from "./GridIcon";
+import { EggIcon, TimeIcon } from "./Icons";
 
 interface EggDetailProps {
   monster: Monster;
   onBack: () => void;
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex justify-between items-center py-1.5">
       <span className="text-sm text-gray-500">{label}</span>
-      <span className="text-sm font-medium text-gray-900">{value}</span>
+      <span className="text-sm font-medium text-gray-900">{children}</span>
     </div>
   );
 }
@@ -46,7 +49,15 @@ export function EggDetail({ monster, onBack }: EggDetailProps) {
         ← Back to results
       </button>
 
-      <div className="rounded-lg p-5 bg-slate-200 shadow-sm border border-slate-300">
+      <div className="rounded-lg p-5 bg-slate-200 shadow-sm border border-slate-300 relative">
+        <a
+          href={`https://mysingingmonsters.fandom.com/wiki/${encodeURIComponent(monster.name.replace(/ /g, "_"))}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-4 right-4 text-sm text-indigo-600 hover:text-indigo-800 underline transition-colors"
+        >
+          View on Wiki ↗
+        </a>
         <div className="flex items-center gap-2">
           <h2 className="text-2xl font-bold text-slate-900">{monster.name}</h2>
           <span
@@ -57,8 +68,15 @@ export function EggDetail({ monster, onBack }: EggDetailProps) {
         </div>
         {monster.associated_element && (
           <div className="mt-2 flex items-center gap-1.5">
-            <span className="text-sm text-slate-500">Element:</span>
+            <span className="text-sm text-slate-500">Calendar Element:</span>
             <ElementIcon element={monster.associated_element} size={24} />
+          </div>
+        )}
+        {(monster.class === "Wublin" ||
+          monster.class === "Rare Wublin" ||
+          monster.class === "Epic Wublin") && (
+          <div className="mt-2 flex items-center gap-1.5">
+            <ElementIcon element="Electricity" size={24} />
           </div>
         )}
       </div>
@@ -69,35 +87,73 @@ export function EggDetail({ monster, onBack }: EggDetailProps) {
           <h3 className="font-semibold text-slate-700 text-sm">Egg Info</h3>
         </div>
         <div className="bg-white px-4 py-2 divide-y divide-gray-100">
-          {eggs.size && <InfoRow label="Size" value={eggs.size} />}
-          {eggs.cost && <InfoRow label="Cost" value={eggs.cost} />}
+          {eggs.size && (
+            <InfoRow label="Size">
+              <span className="inline-flex items-center gap-1">
+                {eggs.size}
+                <GridIcon size={eggs.size} iconSize={20} />
+              </span>
+            </InfoRow>
+          )}
+          {eggs.cost && (
+            <InfoRow label="Cost">
+              <CurrencyValue value={eggs.cost} />
+            </InfoRow>
+          )}
           {eggs.ascension_cost && (
-            <InfoRow label="Ascension Cost" value={eggs.ascension_cost} />
+            <InfoRow label="Ascension Cost">
+              <CurrencyValue value={eggs.ascension_cost} />
+            </InfoRow>
           )}
           {eggs.discounted_cost && (
-            <InfoRow label="Discounted Cost" value={eggs.discounted_cost} />
+            <InfoRow label="Discounted Cost">
+              <CurrencyValue value={eggs.discounted_cost} />
+            </InfoRow>
           )}
-          {eggs.time && <InfoRow label="Time" value={eggs.time} />}
+          {eggs.time && (
+            <InfoRow label="Time">
+              <span className="inline-flex items-center gap-1">
+                {eggs.time}
+                <TimeIcon size={18} />
+              </span>
+            </InfoRow>
+          )}
           {eggs.fill_price && (
-            <InfoRow label="Fill Price" value={eggs.fill_price} />
+            <InfoRow label="Fill Price">
+              <CurrencyValue value={eggs.fill_price} />
+            </InfoRow>
           )}
           {eggs.wildcards != null && (
-            <InfoRow label="Wildcards" value={String(eggs.wildcards)} />
+            <InfoRow label="Wildcards">
+              <span className="inline-flex items-center gap-1">
+                {String(eggs.wildcards)}
+                <CurrencyIcon currency="Wildcards" size={18} />
+              </span>
+            </InfoRow>
           )}
           {eggs.total != null && (
-            <InfoRow label="Total Eggs" value={String(eggs.total)} />
+            <InfoRow label="Total Eggs">
+              <span className="inline-flex items-center gap-1">
+                {String(eggs.total)}
+                <EggIcon size={18} />
+              </span>
+            </InfoRow>
           )}
           {eggs.availability && (
-            <InfoRow label="Availability" value={eggs.availability} />
+            <InfoRow label="Availability">{eggs.availability}</InfoRow>
           )}
           {eggs.sells_for && (
-            <InfoRow label="Sells For" value={eggs.sells_for} />
+            <InfoRow label="Sells For">
+              <CurrencyValue value={eggs.sells_for} />
+            </InfoRow>
           )}
           {eggs.awakened_sells_for && (
-            <InfoRow label="Awakened Sells For" value={eggs.awakened_sells_for} />
+            <InfoRow label="Awakened Sells For">
+              <CurrencyValue value={eggs.awakened_sells_for} />
+            </InfoRow>
           )}
           {eggs.release_date && (
-            <InfoRow label="Release Date" value={eggs.release_date} />
+            <InfoRow label="Release Date">{eggs.release_date}</InfoRow>
           )}
         </div>
       </div>
