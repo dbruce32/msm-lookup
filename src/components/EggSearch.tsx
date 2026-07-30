@@ -23,10 +23,54 @@ const CELESTIAL_FILTERS: { key: FilterKey; label: string }[] = [
   { key: "adult", label: "Adult" },
 ];
 
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+/**
+ * Checks if a celestial monster is currently available based on its
+ * availability string (e.g. "December 1st 3:00pm UTC to January 1st 3:00pm UTC").
+ */
+function isCelestialAvailable(monster: Monster): boolean {
+  const availability = monster.eggs?.availability;
+  if (!availability) return false;
+
+  // Parse start and end months from the availability string
+  const match = availability.match(/^(\w+)\s+\d+.*?to\s+(\w+)\s+\d+/);
+  if (!match) return false;
+
+  const startMonth = MONTH_NAMES.indexOf(match[1]);
+  const endMonth = MONTH_NAMES.indexOf(match[2]);
+  if (startMonth === -1 || endMonth === -1) return false;
+
+  const now = new Date();
+  const currentMonth = now.getUTCMonth(); // 0-indexed
+  const currentDay = now.getUTCDate();
+  const currentHour = now.getUTCHours();
+
+  // Availability runs from the 1st at 15:00 UTC to the 1st at 15:00 UTC
+  // Check if we're within the window
+  if (startMonth <= endMonth) {
+    // Same year range (e.g., March to April)
+    if (currentMonth > startMonth && currentMonth < endMonth) return true;
+    if (currentMonth === startMonth && (currentDay > 1 || (currentDay === 1 && currentHour >= 15))) return true;
+    if (currentMonth === endMonth && (currentDay < 1 || (currentDay === 1 && currentHour < 15))) return true;
+  } else {
+    // Wraps around year boundary (e.g., December to January)
+    if (currentMonth > startMonth || currentMonth < endMonth) return true;
+    if (currentMonth === startMonth && (currentDay > 1 || (currentDay === 1 && currentHour >= 15))) return true;
+    if (currentMonth === endMonth && (currentDay < 1 || (currentDay === 1 && currentHour < 15))) return true;
+  }
+
+  return false;
+}
+
 export function EggSearch({ monsters, label }: EggSearchProps) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Monster | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const [availabilityFilter, setAvailabilityFilter] = useState<"all" | "available" | "unavailable">("all");
   const listRef = useRef<HTMLUListElement>(null);
 
   const filters = label === "Wublins" ? WUBLIN_FILTERS : CELESTIAL_FILTERS;
@@ -62,6 +106,13 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
         if (isAdult) return activeFilters.has("adult");
         return activeFilters.has("young");
       });
+
+      // Available now filter (Celestials only)
+      if (availabilityFilter === "available") {
+        result = result.filter((m) => isCelestialAvailable(m));
+      } else if (availabilityFilter === "unavailable") {
+        result = result.filter((m) => !isCelestialAvailable(m));
+      }
     }
 
     // Apply text search
@@ -71,7 +122,7 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
     }
 
     return result;
-  }, [query, monsters, label, activeFilters]);
+  }, [query, monsters, label, activeFilters, availabilityFilter]);
 
   const getItemId = (index: number) => `egg-option-${label}-${index}`;
   const inputId = `egg-search-${label.toLowerCase().replace(/\s+/g, "-")}`;
@@ -158,7 +209,7 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
           />
         </div>
 
-        <div className="flex gap-2" role="group" aria-label={`Filter ${label}`}>
+        <div className="flex gap-2 flex-wrap" role="group" aria-label={`Filter ${label} by type`}>
           {filters.map((f) => {
             const isActive = activeFilters.has(f.key);
             return (
@@ -179,6 +230,34 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
             );
           })}
         </div>
+        {label === "Celestials" && (
+          <div className="flex gap-2" role="group" aria-label="Filter by availability">
+            <button
+              onClick={() => {
+                setAvailabilityFilter((prev) => {
+                  if (prev === "all") return "available";
+                  if (prev === "available") return "unavailable";
+                  return "all";
+                });
+                setSelected(null);
+                setFocusedIndex(-1);
+              }}
+              className={`px-3 py-1.5 text-sm font-medium rounded-full border transition-colors
+                         focus:outline-none focus:ring-2 focus:ring-emerald-500
+                         ${
+                           availabilityFilter === "available"
+                             ? "bg-emerald-600 text-white border-emerald-600"
+                             : availabilityFilter === "unavailable"
+                               ? "bg-gray-600 text-white border-gray-600"
+                               : "bg-white text-gray-500 border-gray-300 hover:border-gray-400"
+                         }`}
+            >
+              {availabilityFilter === "all" && "All"}
+              {availabilityFilter === "available" && "🟢 Available"}
+              {availabilityFilter === "unavailable" && "Unavailable"}
+            </button>
+          </div>
+        )}
       </div>
 
       {!selected && (
@@ -238,6 +317,12 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
                         {monster.eggs?.total != null && (
                           <span className="ml-2 text-xs text-gray-400">
                             {monster.eggs.total} eggs
+                          </span>
+                        )}
+                        {label === "Celestials" && isCelestialAvailable(monster) && (
+                          <span className="ml-2 inline-flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                            Available
                           </span>
                         )}
                       </span>
