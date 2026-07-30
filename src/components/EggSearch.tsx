@@ -70,7 +70,7 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Monster | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
-  const [availableOnly, setAvailableOnly] = useState(false);
+  const [availabilityFilter, setAvailabilityFilter] = useState<"all" | "available" | "unavailable">("all");
   const listRef = useRef<HTMLUListElement>(null);
 
   const filters = label === "Wublins" ? WUBLIN_FILTERS : CELESTIAL_FILTERS;
@@ -108,8 +108,10 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
       });
 
       // Available now filter (Celestials only)
-      if (availableOnly) {
+      if (availabilityFilter === "available") {
         result = result.filter((m) => isCelestialAvailable(m));
+      } else if (availabilityFilter === "unavailable") {
+        result = result.filter((m) => !isCelestialAvailable(m));
       }
     }
 
@@ -120,7 +122,7 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
     }
 
     return result;
-  }, [query, monsters, label, activeFilters, availableOnly]);
+  }, [query, monsters, label, activeFilters, availabilityFilter]);
 
   const getItemId = (index: number) => `egg-option-${label}-${index}`;
   const inputId = `egg-search-${label.toLowerCase().replace(/\s+/g, "-")}`;
@@ -207,7 +209,7 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
           />
         </div>
 
-        <div className="flex gap-2 flex-wrap" role="group" aria-label={`Filter ${label}`}>
+        <div className="flex gap-2 flex-wrap" role="group" aria-label={`Filter ${label} by type`}>
           {filters.map((f) => {
             const isActive = activeFilters.has(f.key);
             return (
@@ -227,26 +229,35 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
               </button>
             );
           })}
-          {label === "Celestials" && (
+        </div>
+        {label === "Celestials" && (
+          <div className="flex gap-2" role="group" aria-label="Filter by availability">
             <button
               onClick={() => {
-                setAvailableOnly((prev) => !prev);
+                setAvailabilityFilter((prev) => {
+                  if (prev === "all") return "available";
+                  if (prev === "available") return "unavailable";
+                  return "all";
+                });
                 setSelected(null);
                 setFocusedIndex(-1);
               }}
               className={`px-3 py-1.5 text-sm font-medium rounded-full border transition-colors
                          focus:outline-none focus:ring-2 focus:ring-emerald-500
                          ${
-                           availableOnly
+                           availabilityFilter === "available"
                              ? "bg-emerald-600 text-white border-emerald-600"
-                             : "bg-white text-gray-500 border-gray-300 hover:border-gray-400"
+                             : availabilityFilter === "unavailable"
+                               ? "bg-gray-600 text-white border-gray-600"
+                               : "bg-white text-gray-500 border-gray-300 hover:border-gray-400"
                          }`}
-              aria-pressed={availableOnly}
             >
-              🟢 Available Now
+              {availabilityFilter === "all" && "All"}
+              {availabilityFilter === "available" && "🟢 Available"}
+              {availabilityFilter === "unavailable" && "Unavailable"}
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {!selected && (
