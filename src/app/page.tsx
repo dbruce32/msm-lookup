@@ -29,6 +29,7 @@ export default async function Home() {
       monsters={breedingMonsters}
       wublins={wublins}
       celestials={celestials}
+      allMonsters={monsters}
     />
   );
 }

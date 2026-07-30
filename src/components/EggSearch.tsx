@@ -8,6 +8,7 @@ import { ElementIcon } from "./ElementIcon";
 interface EggSearchProps {
   monsters: Monster[];
   label: string;
+  allMonsters: Monster[];
 }
 
 type FilterKey = string;
@@ -66,7 +67,7 @@ function isCelestialAvailable(monster: Monster): boolean {
   return false;
 }
 
-export function EggSearch({ monsters, label }: EggSearchProps) {
+export function EggSearch({ monsters, label, allMonsters }: EggSearchProps) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Monster | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
@@ -336,7 +337,7 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
       )}
 
       {selected && (
-        <EggDetail monster={selected} onBack={() => setSelected(null)} />
+        <EggDetail monster={selected} onBack={() => setSelected(null)} allMonsters={allMonsters} />
       )}
     </div>
   );
