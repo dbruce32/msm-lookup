@@ -8,6 +8,7 @@ import { GridIcon } from "./GridIcon";
 import { EggIcon, TimeIcon } from "./Icons";
 import { IslandIcon } from "./IslandIcon";
 import { BreedingPlanner } from "./BreedingPlanner";
+import { Collapsible } from "./Collapsible";
 
 interface EggDetailProps {
   monster: Monster;
@@ -98,10 +99,7 @@ export function EggDetail({ monster, onBack, allMonsters }: EggDetailProps) {
       </div>
 
       {/* Stats */}
-      <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
-        <div className="px-4 py-2.5 bg-slate-200 border-b border-slate-300">
-          <h3 className="font-semibold text-slate-700 text-sm">Egg Info</h3>
-        </div>
+      <Collapsible title="Egg Info">
         <div className="bg-white px-4 py-2 divide-y divide-gray-100">
           {eggs.size && (
             <InfoRow label="Size">
@@ -172,16 +170,11 @@ export function EggDetail({ monster, onBack, allMonsters }: EggDetailProps) {
             <InfoRow label="Release Date">{eggs.release_date}</InfoRow>
           )}
         </div>
-      </div>
+      </Collapsible>
 
       {/* Requirements */}
       {eggs.requirements && eggs.requirements.length > 0 && (
-        <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
-          <div className="px-4 py-2.5 bg-slate-200 border-b border-slate-300">
-            <h3 className="font-semibold text-slate-700 text-sm">
-              🥚 Egg Requirements ({eggs.requirements.length} monsters)
-            </h3>
-          </div>
+        <Collapsible title={`🥚 Egg Requirements (${eggs.requirements.length} monsters)`}>
           <div className="bg-white divide-y divide-gray-100">
             {eggs.requirements.map((req) => (
               <div
@@ -204,7 +197,7 @@ export function EggDetail({ monster, onBack, allMonsters }: EggDetailProps) {
               </div>
             ))}
           </div>
-        </div>
+        </Collapsible>
       )}
 
       {/* Context info for celestials */}

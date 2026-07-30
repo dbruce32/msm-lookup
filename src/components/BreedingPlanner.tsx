@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import type { Monster } from "@/lib/types";
 import { IslandIcon } from "./IslandIcon";
+import { Collapsible } from "./Collapsible";
 
 interface BreedingPlannerProps {
   monster: Monster;
@@ -234,11 +235,12 @@ export function BreedingPlanner({ monster, allMonsters }: BreedingPlannerProps) 
   if (!eggs || !eggs.requirements || islandSchedules.length === 0) return null;
 
   return (
-    <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
-      <div className="px-4 py-2.5 bg-slate-200 border-b border-slate-300">
-        <h3 className="font-semibold text-slate-700 text-sm">📅 Breeding Planner</h3>
-      </div>
+    <Collapsible title="📅 Breeding Planner" defaultOpen={false}>
       <div className="bg-white p-4 space-y-4">
+        <p className="text-xs text-gray-500">
+          Optimized breeding schedule distributing monsters across all available islands.
+          Hover over bars for details.
+        </p>
         {/* Controls */}
         <div className="flex flex-wrap gap-4 items-center">
           <label className="flex items-center gap-2 text-sm text-gray-700">
@@ -317,7 +319,7 @@ export function BreedingPlanner({ monster, allMonsters }: BreedingPlannerProps) 
                               style={{ left: `${left}%`, width: `${Math.max(width, 0.5)}%` }}
                               title={`${task.monster} (${task.timeLabel})`}
                             >
-                              {width > 8 && <span className="truncate">{task.monster}</span>}
+                              <span className="truncate">{task.monster}</span>
                             </div>
                           );
                         })}
@@ -339,6 +341,6 @@ export function BreedingPlanner({ monster, allMonsters }: BreedingPlannerProps) 
           ))}
         </div>
       </div>
-    </div>
+    </Collapsible>
   );
 }
