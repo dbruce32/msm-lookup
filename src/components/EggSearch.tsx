@@ -10,17 +10,68 @@ interface EggSearchProps {
   label: string;
 }
 
+type FilterKey = string;
+
+const WUBLIN_FILTERS: { key: FilterKey; label: string }[] = [
+  { key: "Wublin", label: "Common" },
+  { key: "Rare Wublin", label: "Rare" },
+  { key: "Epic Wublin", label: "Epic" },
+];
+
+const CELESTIAL_FILTERS: { key: FilterKey; label: string }[] = [
+  { key: "young", label: "Young" },
+  { key: "adult", label: "Adult" },
+];
+
 export function EggSearch({ monsters, label }: EggSearchProps) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Monster | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const listRef = useRef<HTMLUListElement>(null);
 
+  const filters = label === "Wublins" ? WUBLIN_FILTERS : CELESTIAL_FILTERS;
+  const [activeFilters, setActiveFilters] = useState<Set<FilterKey>>(
+    () => new Set(filters.map((f) => f.key))
+  );
+
+  const toggleFilter = (key: FilterKey) => {
+    setActiveFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        // Don't allow deselecting all
+        if (next.size > 1) next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+    setSelected(null);
+    setFocusedIndex(-1);
+  };
+
   const filtered = useMemo(() => {
-    if (!query.trim()) return monsters;
-    const q = query.toLowerCase().trim();
-    return monsters.filter((m) => m.name.toLowerCase().includes(q));
-  }, [query, monsters]);
+    let result = monsters;
+
+    // Apply category filter
+    if (label === "Wublins") {
+      result = result.filter((m) => activeFilters.has(m.class));
+    } else {
+      // Celestials: young vs adult
+      result = result.filter((m) => {
+        const isAdult = m.name.startsWith("Adult");
+        if (isAdult) return activeFilters.has("adult");
+        return activeFilters.has("young");
+      });
+    }
+
+    // Apply text search
+    if (query.trim()) {
+      const q = query.toLowerCase().trim();
+      result = result.filter((m) => m.name.toLowerCase().includes(q));
+    }
+
+    return result;
+  }, [query, monsters, label, activeFilters]);
 
   const getItemId = (index: number) => `egg-option-${label}-${index}`;
   const inputId = `egg-search-${label.toLowerCase().replace(/\s+/g, "-")}`;
@@ -74,49 +125,72 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <label htmlFor={inputId} className="sr-only">
-          Search {label}
-        </label>
-        <input
-          id={inputId}
-          type="text"
-          placeholder={`Search ${label.toLowerCase()}...`}
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setSelected(null);
-            setFocusedIndex(-1);
-          }}
-          onKeyDown={handleKeyDown}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg
-                     bg-white text-gray-900 shadow-sm
-                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-                     placeholder:text-gray-400"
-          aria-label={`Search ${label} by name`}
-          aria-controls={listboxId}
-          aria-activedescendant={
-            focusedIndex >= 0 ? getItemId(focusedIndex) : undefined
-          }
-          autoComplete="off"
-          role="combobox"
-          aria-expanded={!selected}
-          aria-autocomplete="list"
-        />
+    <div className="space-y-4">
+      <div className="space-y-3">
+        <div>
+          <label htmlFor={inputId} className="sr-only">
+            Search {label}
+          </label>
+          <input
+            id={inputId}
+            type="text"
+            placeholder={`Search ${label.toLowerCase()}...`}
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelected(null);
+              setFocusedIndex(-1);
+            }}
+            onKeyDown={handleKeyDown}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg
+                       bg-white text-gray-900 shadow-sm
+                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                       placeholder:text-gray-400"
+            aria-label={`Search ${label} by name`}
+            aria-controls={listboxId}
+            aria-activedescendant={
+              focusedIndex >= 0 ? getItemId(focusedIndex) : undefined
+            }
+            autoComplete="off"
+            role="combobox"
+            aria-expanded={!selected}
+            aria-autocomplete="list"
+          />
+        </div>
+
+        <div className="flex gap-2" role="group" aria-label={`Filter ${label}`}>
+          {filters.map((f) => {
+            const isActive = activeFilters.has(f.key);
+            return (
+              <button
+                key={f.key}
+                onClick={() => toggleFilter(f.key)}
+                className={`px-3 py-1.5 text-sm font-medium rounded-full border transition-colors
+                           focus:outline-none focus:ring-2 focus:ring-indigo-500
+                           ${
+                             isActive
+                               ? "bg-indigo-600 text-white border-indigo-600"
+                               : "bg-white text-gray-500 border-gray-300 hover:border-gray-400"
+                           }`}
+                aria-pressed={isActive}
+              >
+                {f.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {!selected && (
         <div>
           {filtered.length === 0 ? (
             <p className="text-gray-500 text-center py-4">
-              No results found for &ldquo;{query}&rdquo;
+              No results found{query.trim() ? ` for "${query}"` : ""}
             </p>
           ) : (
             <div>
               <p className="text-sm text-gray-500 mb-2">
                 {filtered.length} {label.toLowerCase()}
-                {filtered.length !== 1 ? "" : ""}
               </p>
               <ul
                 ref={listRef}
@@ -155,7 +229,11 @@ export function EggSearch({ monsters, label }: EggSearchProps) {
                         <span
                           className={`ml-2 text-xs px-1.5 py-0.5 rounded ${classBadge(monster.class)}`}
                         >
-                          {monster.class}
+                          {label === "Wublins"
+                            ? monster.class
+                            : monster.name.startsWith("Adult")
+                              ? "Adult"
+                              : "Young"}
                         </span>
                         {monster.eggs?.total != null && (
                           <span className="ml-2 text-xs text-gray-400">
