@@ -206,14 +206,15 @@ export function EggDetail({ monster, onBack, allMonsters }: EggDetailProps) {
           Young Celestial — fill eggs to awaken
         </p>
       )}
+
+      {/* Breeding Planner */}
+      <BreedingPlanner monster={monster} allMonsters={allMonsters} />
+
       {isAdultCelestial && (
         <p className="text-xs text-gray-400 text-center">
           Adult Celestial — available during specific months
         </p>
       )}
-
-      {/* Breeding Planner */}
-      <BreedingPlanner monster={monster} allMonsters={allMonsters} />
     </div>
   );
 }

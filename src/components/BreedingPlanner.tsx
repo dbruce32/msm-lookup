@@ -235,7 +235,7 @@ export function BreedingPlanner({ monster, allMonsters }: BreedingPlannerProps) 
   if (!eggs || !eggs.requirements || islandSchedules.length === 0) return null;
 
   return (
-    <Collapsible title="📅 Breeding Planner" defaultOpen={false}>
+    <Collapsible title="📅 Breeding Planner" defaultOpen={true}>
       <div className="bg-white p-4 space-y-4">
         <p className="text-xs text-gray-500">
           Optimized breeding schedule distributing monsters across all available islands.
