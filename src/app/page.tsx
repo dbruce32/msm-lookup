@@ -1,8 +1,34 @@
-import { MonsterSearch } from "@/components/MonsterSearch";
+import { TabbedHome } from "@/components/TabbedHome";
 import { getAllMonsters } from "@/lib/api";
 
 export default async function Home() {
   const monsters = await getAllMonsters();
 
-  return <MonsterSearch monsters={monsters} />;
+  const wublins = monsters.filter(
+    (m) =>
+      (m.class === "Wublin" ||
+        m.class === "Rare Wublin" ||
+        m.class === "Epic Wublin") &&
+      m.eggs
+  );
+
+  const celestials = monsters.filter(
+    (m) => m.class === "Celestial" && m.eggs
+  );
+
+  const breedingMonsters = monsters.filter(
+    (m) =>
+      m.class !== "Wublin" &&
+      m.class !== "Rare Wublin" &&
+      m.class !== "Epic Wublin" &&
+      m.class !== "Celestial"
+  );
+
+  return (
+    <TabbedHome
+      monsters={breedingMonsters}
+      wublins={wublins}
+      celestials={celestials}
+    />
+  );
 }

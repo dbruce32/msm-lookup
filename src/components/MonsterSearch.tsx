@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback, useRef } from "react";
 import type { Monster } from "@/lib/types";
 import { MonsterDetail } from "./MonsterDetail";
+import { ElementIcon } from "./ElementIcon";
 
 interface MonsterSearchProps {
   monsters: Monster[];
@@ -10,15 +11,28 @@ interface MonsterSearchProps {
 
 export function MonsterSearch({ monsters }: MonsterSearchProps) {
   const [query, setQuery] = useState("");
+  const [classFilter, setClassFilter] = useState<string>("");
   const [selected, setSelected] = useState<Monster | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const listRef = useRef<HTMLUListElement>(null);
 
+  const classes = useMemo(() => {
+    const set = new Set<string>();
+    for (const m of monsters) set.add(m.class);
+    return Array.from(set).sort();
+  }, [monsters]);
+
   const filtered = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase().trim();
-    return monsters.filter((m) => m.name.toLowerCase().includes(q));
-  }, [query, monsters]);
+    let result = monsters;
+    if (classFilter) {
+      result = result.filter((m) => m.class === classFilter);
+    }
+    if (query.trim()) {
+      const q = query.toLowerCase().trim();
+      result = result.filter((m) => m.name.toLowerCase().includes(q));
+    }
+    return result;
+  }, [query, classFilter, monsters]);
 
   const getItemId = (index: number) => `monster-option-${index}`;
 
@@ -56,24 +70,25 @@ export function MonsterSearch({ monsters }: MonsterSearchProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <label htmlFor="monster-search" className="sr-only">
-          Search monsters
-        </label>
-        <input
-          id="monster-search"
-          type="text"
-          placeholder="Search for a monster..."
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setSelected(null);
-            setFocusedIndex(-1);
-          }}
-          onKeyDown={handleKeyDown}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg
-                     bg-white text-gray-900 shadow-sm
-                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+      <div className="space-y-3">
+        <div>
+          <label htmlFor="monster-search" className="sr-only">
+            Search monsters
+          </label>
+          <input
+            id="monster-search"
+            type="text"
+            placeholder="Search for a monster..."
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelected(null);
+              setFocusedIndex(-1);
+            }}
+            onKeyDown={handleKeyDown}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg
+                       bg-white text-gray-900 shadow-sm
+                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
                      placeholder:text-gray-400"
           aria-label="Search monsters by name"
           aria-controls="monster-results-listbox"
@@ -85,9 +100,34 @@ export function MonsterSearch({ monsters }: MonsterSearchProps) {
           aria-expanded={filtered.length > 0 && !selected}
           aria-autocomplete="list"
         />
+        </div>
+        <div>
+          <label htmlFor="class-filter" className="sr-only">
+            Filter by class
+          </label>
+          <select
+            id="class-filter"
+            value={classFilter}
+            onChange={(e) => {
+              setClassFilter(e.target.value);
+              setSelected(null);
+              setFocusedIndex(-1);
+            }}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
+                       bg-white text-gray-700 shadow-sm
+                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          >
+            <option value="">All Classes</option>
+            {classes.map((cls) => (
+              <option key={cls} value={cls}>
+                {cls}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {query.trim() && !selected && (
+      {!selected && (
         <div>
           {filtered.length === 0 ? (
             <p className="text-gray-500 text-center py-4">
@@ -102,7 +142,7 @@ export function MonsterSearch({ monsters }: MonsterSearchProps) {
                 ref={listRef}
                 id="monster-results-listbox"
                 role="listbox"
-                className="border border-gray-200 rounded-lg divide-y divide-gray-100 bg-white shadow-sm"
+                className="border border-gray-200 rounded-lg divide-y divide-gray-100 bg-white shadow-sm max-h-96 overflow-y-auto"
               >
                 {filtered.map((monster, index) => (
                   <li
@@ -115,7 +155,7 @@ export function MonsterSearch({ monsters }: MonsterSearchProps) {
                       onClick={() => setSelected(monster)}
                       onMouseEnter={() => setFocusedIndex(index)}
                       onMouseLeave={() => setFocusedIndex(-1)}
-                      className={`w-full text-left px-4 py-3 transition-colors
+                      className={`w-full text-left px-4 py-3 flex items-center gap-2 transition-colors
                                  focus:outline-none
                                  ${
                                    focusedIndex === index
@@ -125,11 +165,13 @@ export function MonsterSearch({ monsters }: MonsterSearchProps) {
                       tabIndex={-1}
                     >
                       <span className="font-medium text-gray-900">{monster.name}</span>
-                      <span className="ml-2 text-xs text-gray-400">
-                        {monster.class}
+                      <span className="inline-flex gap-1 items-center">
+                        {monster.elements.map((el) => (
+                          <ElementIcon key={el} element={el} size={22} />
+                        ))}
                       </span>
-                      <span className="ml-1 text-sm text-gray-500">
-                        · {monster.elements.join(", ")}
+                      <span className="ml-auto text-xs text-gray-400">
+                        {monster.class}
                       </span>
                     </button>
                   </li>
