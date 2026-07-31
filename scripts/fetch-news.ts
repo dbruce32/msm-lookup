@@ -5,7 +5,7 @@ const OUT_DIR = path.join(process.cwd(), "src", "data");
 const OUT_FILE = path.join(OUT_DIR, "patch-notes.json");
 
 const WIKI_API = "https://mysingingmonsters.fandom.com/api.php";
-const PAGE = "Version_History/4.0";
+const PAGES = ["Version_History", "Version_History/4.0"];
 
 interface PatchNote {
   version: string;
@@ -91,21 +91,35 @@ function cleanWikitext(text: string): string {
 async function main() {
   console.log("📰 Fetching MSM patch notes...\n");
 
-  const url = `${WIKI_API}?action=parse&page=${encodeURIComponent(PAGE)}&prop=wikitext&format=json`;
-  const res = await fetch(url);
+  const allNotes: PatchNote[] = [];
 
-  if (!res.ok) {
-    throw new Error(`Wiki API returned ${res.status}`);
+  for (const page of PAGES) {
+    const url = `${WIKI_API}?action=parse&page=${encodeURIComponent(page)}&prop=wikitext&format=json`;
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Wiki API returned ${res.status} for ${page}`);
+    }
+
+    const data = await res.json();
+    const wikitext: string = data.parse.wikitext["*"];
+    const notes = parseWikitext(wikitext);
+    console.log(`  ✓ ${page}: ${notes.length} versions`);
+    allNotes.push(...notes);
   }
 
-  const data = await res.json();
-  const wikitext: string = data.parse.wikitext["*"];
+  // Deduplicate by version (in case of overlap) and sort descending
+  const seen = new Set<string>();
+  const deduplicated = allNotes.filter((n) => {
+    if (seen.has(n.version)) return false;
+    seen.add(n.version);
+    return true;
+  });
 
-  const notes = parseWikitext(wikitext);
-  console.log(`  ✓ Parsed ${notes.length} version entries`);
+  console.log(`\n  📊 Total: ${deduplicated.length} unique versions`);
 
   // Show a preview
-  const latest = notes[0];
+  const latest = deduplicated[0];
   if (latest) {
     console.log(`  • Latest: v${latest.version} (${latest.releaseDate ?? "unknown date"})`);
     console.log(`  • ${latest.highlights.length} notes`);
@@ -113,8 +127,8 @@ async function main() {
 
   // Write output
   await mkdir(OUT_DIR, { recursive: true });
-  await writeFile(OUT_FILE, JSON.stringify(notes, null, 2) + "\n");
-  const fileSize = (Buffer.byteLength(JSON.stringify(notes, null, 2)) / 1024).toFixed(0);
+  await writeFile(OUT_FILE, JSON.stringify(deduplicated, null, 2) + "\n");
+  const fileSize = (Buffer.byteLength(JSON.stringify(deduplicated, null, 2)) / 1024).toFixed(0);
   console.log(`\n💾 Written to ${OUT_FILE} (${fileSize} KB)`);
   console.log("✅ Done");
 }
