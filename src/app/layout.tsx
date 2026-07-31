@@ -35,12 +35,15 @@ export default function RootLayout({
               height={40}
               className="rounded"
             />
-            <div>
+            <div className="flex-1">
               <h1 className="text-xl font-bold">MSM Lookup</h1>
               <p className="text-sm text-slate-300">
                 Monster Breeding Search Engine
               </p>
             </div>
+            <p className="text-xs text-slate-400 text-right">
+              Data refreshed daily<br />06:00 UTC
+            </p>
           </div>
         </header>
         <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">

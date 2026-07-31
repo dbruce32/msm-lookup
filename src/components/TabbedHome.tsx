@@ -5,12 +5,32 @@ import type { Monster } from "@/lib/types";
 import { Tabs } from "./Tabs";
 import { MonsterSearch } from "./MonsterSearch";
 import { EggSearch } from "./EggSearch";
+import { Changelog } from "./Changelog";
+import { PatchNotes } from "./PatchNotes";
 
-const TABS = [
-  { id: "breeding", label: "Breeding" },
-  { id: "wublins", label: "Wublins" },
-  { id: "celestials", label: "Celestials" },
-  { id: "about", label: "About" },
+const TAB_GROUPS = [
+  {
+    label: "Monsters",
+    tabs: [
+      { id: "breeding", label: "Breeding" },
+      { id: "wublins", label: "Wublins" },
+      { id: "celestials", label: "Celestials" },
+    ],
+  },
+  {
+    label: "Info",
+    tabs: [
+      { id: "news", label: "News" },
+      { id: "changelog", label: "Changelog" },
+    ],
+  },
+  {
+    label: "Meta",
+    align: "right" as const,
+    tabs: [
+      { id: "about", label: "About" },
+    ],
+  },
 ];
 
 interface TabbedHomeProps {
@@ -18,14 +38,15 @@ interface TabbedHomeProps {
   wublins: Monster[];
   celestials: Monster[];
   allMonsters: Monster[];
+  patchNotes: { version: string; releaseDate: string | null; highlights: string[]; officialUrl: string | null }[];
 }
 
-export function TabbedHome({ monsters, wublins, celestials, allMonsters }: TabbedHomeProps) {
+export function TabbedHome({ monsters, wublins, celestials, allMonsters, patchNotes }: TabbedHomeProps) {
   const [activeTab, setActiveTab] = useState("breeding");
 
   return (
     <div className="space-y-6">
-      <Tabs tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
+      <Tabs tabGroups={TAB_GROUPS} activeTab={activeTab} onTabChange={setActiveTab} />
 
       <div
         role="tabpanel"
@@ -39,6 +60,7 @@ export function TabbedHome({ monsters, wublins, celestials, allMonsters }: Tabbe
         {activeTab === "celestials" && (
           <EggSearch monsters={celestials} label="Celestials" allMonsters={allMonsters} />
         )}
+        {activeTab === "news" && <PatchNotes notes={patchNotes} />}
         {activeTab === "about" && (
           <div className="space-y-6">
             {/* Description */}
@@ -112,6 +134,7 @@ export function TabbedHome({ monsters, wublins, celestials, allMonsters }: Tabbe
             </div>
           </div>
         )}
+        {activeTab === "changelog" && <Changelog />}
       </div>
     </div>
   );
