@@ -1,4 +1,5 @@
 import { TabbedHome } from "@/components/TabbedHome";
+import { SidebarLayout } from "@/components/SidebarLayout";
 import { getAllMonsters } from "@/lib/api";
 import patchNotes from "@/data/patch-notes.json";
 
@@ -26,12 +27,14 @@ export default async function Home() {
   );
 
   return (
-    <TabbedHome
-      monsters={breedingMonsters}
-      wublins={wublins}
-      celestials={celestials}
-      allMonsters={monsters}
-      patchNotes={patchNotes}
-    />
+    <SidebarLayout>
+      <TabbedHome
+        monsters={breedingMonsters}
+        wublins={wublins}
+        celestials={celestials}
+        allMonsters={monsters}
+        patchNotes={patchNotes}
+      />
+    </SidebarLayout>
   );
 }

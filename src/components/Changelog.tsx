@@ -11,6 +11,57 @@ export function Changelog() {
         {/* Vertical line */}
         <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200" />
 
+        {/* July 31, 2026 — Sidebar & Seasonal Events */}
+        <div className="relative pb-8">
+          <div className="absolute left-[-20px] top-1 w-3 h-3 rounded-full bg-indigo-500 ring-4 ring-white" />
+          <div className="rounded-lg p-6 bg-white shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700">
+                New Feature
+              </span>
+              <time className="text-sm text-gray-500" dateTime="2026-07-31">
+                July 31, 2026
+              </time>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Sidebar &amp; Seasonal Events
+            </h3>
+            <ul className="list-disc list-inside text-gray-600 space-y-1 text-sm">
+              <li>Desktop sidebar with seasonal event indicator and quick links</li>
+              <li>Seasonal event calendar with approximate date ranges for all 15 MSM events</li>
+              <li>Shows currently active event or next upcoming event</li>
+              <li>Mobile-friendly: compact event banner above tabs on small screens</li>
+              <li>Quick links to MSM Wiki, Reddit, Discord, Official Site, and msm-db</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* July 31, 2026 — Navigation & Search Improvements */}
+        <div className="relative pb-8">
+          <div className="absolute left-[-20px] top-1 w-3 h-3 rounded-full bg-green-500 ring-4 ring-white" />
+          <div className="rounded-lg p-6 bg-white shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-700">
+                Improvement
+              </span>
+              <time className="text-sm text-gray-500" dateTime="2026-07-31">
+                July 31, 2026
+              </time>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Navigation &amp; Search Improvements
+            </h3>
+            <ul className="list-disc list-inside text-gray-600 space-y-1 text-sm">
+              <li>Grouped tab navigation: Monsters vs Info sections with visual separator</li>
+              <li>About tab moved to the far right</li>
+              <li>Horizontal scroll on mobile for tabs (no more overflow/wrapping)</li>
+              <li>Improved &ldquo;no results&rdquo; state with contextual messages and a clear filters button</li>
+              <li>Header now shows &ldquo;Data refreshed daily 06:00 UTC&rdquo;</li>
+              <li>Fixed gitignore to cover all generated data files in src/data/</li>
+            </ul>
+          </div>
+        </div>
+
         {/* July 31, 2026 — MSM Patch Notes */}
         <div className="relative pb-8">
           <div className="absolute left-[-20px] top-1 w-3 h-3 rounded-full bg-indigo-500 ring-4 ring-white" />

@@ -27,7 +27,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-slate-100">
         <header className="bg-slate-800 text-white shadow-md">
-          <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
+          <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-3">
             <img
               src="/msm-lookup/favicon_maw.png"
               alt="MSM Lookup logo"
@@ -46,11 +46,11 @@ export default function RootLayout({
             </p>
           </div>
         </header>
-        <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
+        <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-8">
           {children}
         </main>
         <footer className="bg-slate-800 text-slate-400">
-          <div className="max-w-3xl mx-auto px-4 py-4 text-sm">
+          <div className="max-w-5xl mx-auto px-4 py-4 text-sm">
             Data from{" "}
             <a
               href="https://dbruce32.github.io/msm-db/"
