@@ -26,4 +26,4 @@ yarn-error.log*
 next-env.d.ts
 
 # generated data
-src/data/monsters.json
+src/data/
