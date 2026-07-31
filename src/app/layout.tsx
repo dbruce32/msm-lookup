@@ -23,6 +23,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const buildDate = new Date().toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-slate-100">
@@ -35,12 +41,15 @@ export default function RootLayout({
               height={40}
               className="rounded"
             />
-            <div>
+            <div className="flex-1">
               <h1 className="text-xl font-bold">MSM Lookup</h1>
               <p className="text-sm text-slate-300">
                 Monster Breeding Search Engine
               </p>
             </div>
+            <p className="text-xs text-slate-400 text-right">
+              Updated<br />{buildDate}
+            </p>
           </div>
         </header>
         <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
