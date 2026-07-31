@@ -5,12 +5,14 @@ import type { Monster } from "@/lib/types";
 import { Tabs } from "./Tabs";
 import { MonsterSearch } from "./MonsterSearch";
 import { EggSearch } from "./EggSearch";
+import { Changelog } from "./Changelog";
 
 const TABS = [
   { id: "breeding", label: "Breeding" },
   { id: "wublins", label: "Wublins" },
   { id: "celestials", label: "Celestials" },
   { id: "about", label: "About" },
+  { id: "changelog", label: "Changelog" },
 ];
 
 interface TabbedHomeProps {
@@ -112,6 +114,7 @@ export function TabbedHome({ monsters, wublins, celestials, allMonsters }: Tabbe
             </div>
           </div>
         )}
+        {activeTab === "changelog" && <Changelog />}
       </div>
     </div>
   );
