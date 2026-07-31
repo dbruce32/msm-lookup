@@ -11,6 +11,53 @@ export function Changelog() {
         {/* Vertical line */}
         <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200" />
 
+        {/* July 31, 2026 — MSM Patch Notes */}
+        <div className="relative pb-8">
+          <div className="absolute left-[-20px] top-1 w-3 h-3 rounded-full bg-indigo-500 ring-4 ring-white" />
+          <div className="rounded-lg p-6 bg-white shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700">
+                New Feature
+              </span>
+              <time className="text-sm text-gray-500" dateTime="2026-07-31">
+                July 31, 2026
+              </time>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              MSM Patch Notes Tab
+            </h3>
+            <ul className="list-disc list-inside text-gray-600 space-y-1 text-sm">
+              <li>New &ldquo;News&rdquo; tab with official MSM game patch notes</li>
+              <li>Data fetched from the MSM wiki at build time</li>
+              <li>40 version entries from v4.0.0 through v5.5.0</li>
+              <li>Timeline layout with version badges and official post links</li>
+              <li>&ldquo;Show all&rdquo; toggle to expand beyond the initial 10 entries</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* July 30, 2026 — Changelog Tab */}
+        <div className="relative pb-8">
+          <div className="absolute left-[-20px] top-1 w-3 h-3 rounded-full bg-indigo-500 ring-4 ring-white" />
+          <div className="rounded-lg p-6 bg-white shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700">
+                New Feature
+              </span>
+              <time className="text-sm text-gray-500" dateTime="2026-07-30">
+                July 30, 2026
+              </time>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Changelog Tab
+            </h3>
+            <ul className="list-disc list-inside text-gray-600 space-y-1 text-sm">
+              <li>In-app changelog with vertical timeline layout</li>
+              <li>Entries organized by commit date with color-coded badges</li>
+            </ul>
+          </div>
+        </div>
+
         {/* July 30, 2026 — Egg Island Breeding Planner */}
         <div className="relative pb-8">
           <div className="absolute left-[-20px] top-1 w-3 h-3 rounded-full bg-indigo-500 ring-4 ring-white" />
