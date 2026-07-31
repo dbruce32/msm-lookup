@@ -1,5 +1,6 @@
 import { TabbedHome } from "@/components/TabbedHome";
 import { getAllMonsters } from "@/lib/api";
+import patchNotes from "@/data/patch-notes.json";
 
 export default async function Home() {
   const monsters = await getAllMonsters();
@@ -30,6 +31,7 @@ export default async function Home() {
       wublins={wublins}
       celestials={celestials}
       allMonsters={monsters}
+      patchNotes={patchNotes}
     />
   );
 }

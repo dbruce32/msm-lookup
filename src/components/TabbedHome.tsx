@@ -6,11 +6,13 @@ import { Tabs } from "./Tabs";
 import { MonsterSearch } from "./MonsterSearch";
 import { EggSearch } from "./EggSearch";
 import { Changelog } from "./Changelog";
+import { PatchNotes } from "./PatchNotes";
 
 const TABS = [
   { id: "breeding", label: "Breeding" },
   { id: "wublins", label: "Wublins" },
   { id: "celestials", label: "Celestials" },
+  { id: "news", label: "News" },
   { id: "about", label: "About" },
   { id: "changelog", label: "Changelog" },
 ];
@@ -20,9 +22,10 @@ interface TabbedHomeProps {
   wublins: Monster[];
   celestials: Monster[];
   allMonsters: Monster[];
+  patchNotes: { version: string; releaseDate: string | null; highlights: string[]; officialUrl: string | null }[];
 }
 
-export function TabbedHome({ monsters, wublins, celestials, allMonsters }: TabbedHomeProps) {
+export function TabbedHome({ monsters, wublins, celestials, allMonsters, patchNotes }: TabbedHomeProps) {
   const [activeTab, setActiveTab] = useState("breeding");
 
   return (
@@ -41,6 +44,7 @@ export function TabbedHome({ monsters, wublins, celestials, allMonsters }: Tabbe
         {activeTab === "celestials" && (
           <EggSearch monsters={celestials} label="Celestials" allMonsters={allMonsters} />
         )}
+        {activeTab === "news" && <PatchNotes notes={patchNotes} />}
         {activeTab === "about" && (
           <div className="space-y-6">
             {/* Description */}
