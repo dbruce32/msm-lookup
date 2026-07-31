@@ -23,12 +23,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const buildDate = new Date().toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-slate-100">
@@ -48,7 +42,7 @@ export default function RootLayout({
               </p>
             </div>
             <p className="text-xs text-slate-400 text-right">
-              Updated<br />{buildDate}
+              Data refreshed daily<br />06:00 UTC
             </p>
           </div>
         </header>

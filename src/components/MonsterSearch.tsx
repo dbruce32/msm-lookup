@@ -130,9 +130,27 @@ export function MonsterSearch({ monsters }: MonsterSearchProps) {
       {!selected && (
         <div>
           {filtered.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">
-              No monsters found for &ldquo;{query}&rdquo;
-            </p>
+            <div className="text-center py-10 space-y-2">
+              <p className="text-gray-400 text-4xl">🔍</p>
+              <p className="text-gray-700 font-medium">
+                No monsters found
+              </p>
+              <p className="text-sm text-gray-500">
+                {query.trim() && classFilter
+                  ? `No "${query}" in the ${classFilter} class. Try a different class or check the spelling.`
+                  : query.trim()
+                  ? `No results for "${query}". Check the spelling or try a shorter search.`
+                  : `No monsters in the ${classFilter} class.`}
+              </p>
+              {(query.trim() || classFilter) && (
+                <button
+                  onClick={() => { setQuery(""); setClassFilter(""); }}
+                  className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 underline"
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
           ) : (
             <div>
               <p className="text-sm text-gray-500 mb-2">

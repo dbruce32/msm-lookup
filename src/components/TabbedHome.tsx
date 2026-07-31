@@ -8,13 +8,29 @@ import { EggSearch } from "./EggSearch";
 import { Changelog } from "./Changelog";
 import { PatchNotes } from "./PatchNotes";
 
-const TABS = [
-  { id: "breeding", label: "Breeding" },
-  { id: "wublins", label: "Wublins" },
-  { id: "celestials", label: "Celestials" },
-  { id: "news", label: "News" },
-  { id: "about", label: "About" },
-  { id: "changelog", label: "Changelog" },
+const TAB_GROUPS = [
+  {
+    label: "Monsters",
+    tabs: [
+      { id: "breeding", label: "Breeding" },
+      { id: "wublins", label: "Wublins" },
+      { id: "celestials", label: "Celestials" },
+    ],
+  },
+  {
+    label: "Info",
+    tabs: [
+      { id: "news", label: "News" },
+      { id: "changelog", label: "Changelog" },
+    ],
+  },
+  {
+    label: "Meta",
+    align: "right" as const,
+    tabs: [
+      { id: "about", label: "About" },
+    ],
+  },
 ];
 
 interface TabbedHomeProps {
@@ -30,7 +46,7 @@ export function TabbedHome({ monsters, wublins, celestials, allMonsters, patchNo
 
   return (
     <div className="space-y-6">
-      <Tabs tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
+      <Tabs tabGroups={TAB_GROUPS} activeTab={activeTab} onTabChange={setActiveTab} />
 
       <div
         role="tabpanel"
