@@ -41,9 +41,14 @@ export default function RootLayout({
                 Monster Breeding Search Engine
               </p>
             </div>
-            <p className="text-xs text-slate-400 text-right">
-              Data refreshed daily<br />06:00 UTC
-            </p>
+            <nav className="flex items-center gap-3">
+              <a
+                href="/msm-lookup/dipster-digs"
+                className="text-sm text-slate-300 hover:text-white transition-colors"
+              >
+                Dipster Digs
+              </a>
+            </nav>
           </div>
         </header>
         <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-8">
