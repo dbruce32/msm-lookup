@@ -11,6 +11,59 @@ export function Changelog() {
         {/* Vertical line */}
         <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200" />
 
+        {/* August 9, 2026 — Dipster Digs Solver */}
+        <div className="relative pb-8">
+          <div className="absolute left-[-20px] top-1 w-3 h-3 rounded-full bg-indigo-500 ring-4 ring-white" />
+          <div className="rounded-lg p-6 bg-white shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700">
+                New Feature
+              </span>
+              <time className="text-sm text-gray-500" dateTime="2026-08-09">
+                August 9, 2026
+              </time>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Dipster Digs Solver
+            </h3>
+            <ul className="list-disc list-inside text-gray-600 space-y-1 text-sm">
+              <li>New Dipster Digs minigame helper tool on dedicated page</li>
+              <li>Interactive grid with setup phase (dimensions, obstacles) and play phase</li>
+              <li>Minesweeper-style constraint solver with set-based intersection reasoning</li>
+              <li>Probability estimation for uncertain tiles with color-coded display</li>
+              <li>Recommended next dig highlighting — all equally-good tiles shown</li>
+              <li>Token-efficient strategy: prioritizes guaranteed Dipsters, then highest probability</li>
+              <li>Obstacle support (Broken Rock, Small Rock) with dig cost tracking</li>
+              <li>Zworaffe support with automatic cardinal neighbor reveal</li>
+              <li>Flag mode for manual player tracking</li>
+              <li>&ldquo;How This Is Calculated&rdquo; tab explaining the solver approach</li>
+              <li>Disclaimer noting approximate (not optimal) solutions</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* August 9, 2026 — UI Polish */}
+        <div className="relative pb-8">
+          <div className="absolute left-[-20px] top-1 w-3 h-3 rounded-full bg-green-500 ring-4 ring-white" />
+          <div className="rounded-lg p-6 bg-white shadow-sm border border-gray-200">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-700">
+                Improvement
+              </span>
+              <time className="text-sm text-gray-500" dateTime="2026-08-09">
+                August 9, 2026
+              </time>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              UI Polish
+            </h3>
+            <ul className="list-disc list-inside text-gray-600 space-y-1 text-sm">
+              <li>Header navigation link to Dipster Digs</li>
+              <li>Fixed overscroll color — dark blue (slate-800) now shows instead of white when scrolling past page bounds</li>
+            </ul>
+          </div>
+        </div>
+
         {/* July 31, 2026 — Sidebar & Seasonal Events */}
         <div className="relative pb-8">
           <div className="absolute left-[-20px] top-1 w-3 h-3 rounded-full bg-indigo-500 ring-4 ring-white" />
